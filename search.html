@@ -1,0 +1,53 @@
+<!-- search.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск профиля</title>
+</head>
+<body>
+    <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); max-width: 300px; margin: auto;">
+        <div class="profile-info">
+            <h2 class="profile-username" style="color: grey; font-size: 18px;">${user.username}</h2>
+            <p class="title profile-email" style="font-size: 18px;">${user.email}</p>
+        </div>
+        <button class="add-friend-button" id="addFriendButton" style="border: none; outline: 0; display: inline-block; padding: 8px; color: white; background-color: #000; text-align: center; cursor: pointer; width: 100%; font-size: 18px;" data-useremail="${foundUsers[0].email}">Добавить в друзья</button>
+    </div>
+    <script src="client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchResultsContainer = document.getElementById('searchResults');
+        
+            // Обработчик события клика на кнопку "Поиск"
+            document.getElementById('searchButton').addEventListener('click', function() {
+                const username = document.getElementById('usernameInput').value;
+        
+                // Отправка AJAX-запроса на сервер для поиска пользователя
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Вставка HTML-разметки с информацией о найденных пользователях в контейнер
+                    searchResultsContainer.innerHTML = data.searchResultsHTML;
+        
+                    // Подключение клиентского JavaScript
+                    const script = document.createElement('script');
+                    script.src = 'client.js';
+                    searchResultsContainer.appendChild(script);
+                })
+                .catch(error => {
+                    console.error('Ошибка при поиске пользователя:', error);
+                });
+            });
+        });
+        
+    </script>
+    
+</body>
+</html>
