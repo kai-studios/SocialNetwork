@@ -1,3 +1,5 @@
+// server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -33,6 +35,15 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 
+// Middleware для проверки аутентификации пользователя
+const requireAuth = (req, res, next) => {
+    if (req.session.user) {
+        next(); // Если пользователь аутентифицирован, переходим к следующему обработчику
+    } else {
+        res.redirect('/login'); // Если пользователь не аутентифицирован, перенаправляем на страницу входа
+    }
+};
+
 // Обработчик GET-запроса для отображения страницы регистрации
 app.get('/register', (req, res) => {
     res.sendFile(__dirname + '/register.html');
@@ -47,7 +58,7 @@ app.post('/register', async (req, res) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log("Пользователь успешно зарегистрирован:", user.uid);
-        res.status(200).json({ message: 'Пользователь успешно зарегистрирован' });
+        req.session.user = user; // Сохраняем пользователя в сессии
         res.redirect('/');
     } catch (error) {
         console.error('Ошибка при регистрации пользователя:', error.message);
@@ -55,7 +66,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// Обработчик GET-запроса для отображения страницы регистрации
+// Обработчик GET-запроса для отображения страницы входа
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/login.html');
 });
@@ -69,7 +80,7 @@ app.post('/login', async (req, res) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log("Пользователь успешно аутентифицирован:", user.uid);
-        res.status(200).json({ message: 'Пользователь успешно аутентифицирован' });
+        req.session.user = user; // Сохраняем пользователя в сессии
         res.redirect('/');
     } catch (error) {
         console.error('Ошибка при аутентификации пользователя:', error.message);
@@ -81,6 +92,11 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Обработчик GET-запроса для отображения главной страницы
+app.get('/', requireAuth, (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 // Массив пользователей (просто для демонстрации)
 const users = [
     { id: 1, username: 'user1' },
@@ -88,13 +104,8 @@ const users = [
     { id: 3, username: 'user3' }
 ];
 
-// Обработчик GET-запроса для отображения главной страницы
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-});
-
 // Обработчик GET-запроса для поиска пользователей
-app.get('/search', (req, res) => {
+app.get('/search', requireAuth, (req, res) => {
     const query = req.query.query.toLowerCase();
     const filteredUsers = users.filter(user => user.username.toLowerCase().includes(query));
     res.json(filteredUsers);
