@@ -1,0 +1,77 @@
+<!-- chat.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .messages {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        form {
+            display: flex;
+            margin-top: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div class="chat-container">
+        <h2>Chat ID: <%= chatId %></h2>
+        <div class="messages">
+            <% chatData.messages.forEach(message => { %>
+                <div class="message">
+                    <strong><%= message.sender %>:</strong> <%= message.text %>
+                </div>
+            <% }); %>
+        </div>
+        <form action="/sendMessage" method="POST">
+            <input type="hidden" name="chatId" value="<%= chatId %>">
+            <input type="text" name="message" placeholder="Введите сообщение..." required>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+</body>
+</html>

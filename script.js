@@ -1,27 +1,27 @@
 // script.js
 
-// Функция для выполнения поиска пользователей
-function searchUser() {
-    const searchInput = document.getElementById('searchUserInput').value;
-    
-    // Отправляем запрос на сервер для поиска пользователей
-    fetch(`/search?query=${searchInput}`)
-        .then(response => response.json())
-        .then(data => {
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = ''; // Очищаем предыдущие результаты
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
 
-            // Отображаем результаты поиска
-            data.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.textContent = user.username;
-                searchResults.appendChild(userElement);
-            });
-        })
-        .catch(error => console.error('Ошибка при поиске пользователей:', error));
-}
+    searchForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-// Функция для начала нового чата
-function startChat() {
-    // Логика для начала нового чата
-}
+        const searchQuery = searchInput.value.trim();
+
+        try {
+            const response = await fetch(`/search?email=${searchQuery}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                // Выводим результаты поиска
+                console.log(data);
+            } else {
+                // Выводим сообщение об ошибке
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error.message);
+        }
+    });
+});

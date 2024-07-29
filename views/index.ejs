@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --background: #121212;
+            --navbar-width: 250px;
+            --navbar-width-collapsed: 80px;
+            --navbar-dark-primary: #1e1e1e;
+            --navbar-light-primary: #f5f6fa;
+            --navbar-light-secondary: #8392a5;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: var(--background);
+            font-family: 'Arial', sans-serif;
+            color: #ecf0f1;
+        }
+
+        #sidebar {
+            width: var(--navbar-width);
+            height: 100%;
+            background: var(--navbar-dark-primary);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed {
+            width: var(--navbar-width-collapsed);
+        }
+
+        #sidebar .logo {
+            padding: 1rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        #sidebar .toggle-btn {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        #sidebar .menu {
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        #sidebar .menu li {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #sidebar .menu li:hover {
+            background: #333;
+        }
+
+        #sidebar .menu li i {
+            margin-right: 1rem;
+        }
+
+        #sidebar .menu li span {
+            display: inline;
+        }
+
+        #sidebar.collapsed .menu li span {
+            display: none;
+        }
+
+        #sidebar .admin-panel {
+            border-top: 1px solid var(--navbar-light-secondary);
+        }
+
+        #sidebar .widgets {
+            padding: 1rem;
+            border-top: 1px solid var(--navbar-light-secondary);
+            position: relative;
+        }
+
+        #sidebar .profile {
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .profile img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        #sidebar .profile .status {
+            color: var(--navbar-light-secondary);
+            font-size: 0.8rem;
+        }
+
+        #sidebar .profile-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar .controls {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #sidebar .controls.show {
+            display: flex;
+        }
+
+        #sidebar .controls .buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        #sidebar .controls .buttons button {
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        #sidebar .controls .volume {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        #sidebar .controls .volume input[type="range"] {
+            width: 100%;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <div class="toggle-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">NightLab</div>
+        <ul class="menu">
+            <li><i class="fas fa-home"></i> <span>Home</span></li>
+            <li><i class="fas fa-comments"></i> <span>Chats</span></li>
+            <li><i class="fas fa-bell"></i> <span>Notifications</span></li>
+            <li><i class="fas fa-video"></i> <span>Videos</span></li>
+            <li><i class="fas fa-music"></i> <span>Music</span></li>
+            <li><i class="fas fa-gamepad"></i> <span>Games</span></li>
+            <li class="admin-panel"><i class="fas fa-tools"></i> <span>Admin Panel</span></li>
+        </ul>
+        <div class="widgets">
+            <div class="profile">
+                <img src="https://firebasestorage.googleapis.com/v0/b/socialnetwork-37297.appspot.com/o/default_profile_picture.jpg?alt=media&token=957c4bf3-f9a0-41f3-b7f2-0f84cad35681" alt="Profile Picture">
+                <div class="profile-details">
+                    <div class="nickname">Nickname</div>
+                    <div class="status">online</div>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="buttons">
+                    <button onclick="rewind()"><i class="fas fa-undo"></i></button>
+                    <button onclick="pause()"><i class="fas fa-pause"></i></button>
+                    <button onclick="forward()"><i class="fas fa-redo"></i></button>
+                </div>
+                <div class="volume">
+                    <i class="fas fa-volume-down"></i>
+                    <input type="range" min="0" max="100" value="50">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="main-content">
+        <!-- Main content goes here -->
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            // Скрыть элементы управления музыкой при сворачивании
+            if (sidebar.classList.contains('collapsed')) {
+                document.querySelector('.controls').classList.remove('show');
+            }
+        }
+
+        let lastScrollTop = 0;
+        document.getElementById('sidebar').addEventListener('wheel', function(event) {
+            const profile = document.querySelector('.profile');
+            const controls = document.querySelector('.controls');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                return;
+            }
+
+            if (event.deltaY > 0) {
+                profile.style.display = 'none';
+                controls.classList.add('show');
+            } else {
+                profile.style.display = 'flex';
+                controls.classList.remove('show');
+            }
+        });
+
+        function rewind() {
+            console.log('Rewind 10 seconds');
+        }
+
+        function pause() {
+            console.log('Pause');
+        }
+
+        function forward() {
+            console.log('Forward 10 seconds');
+        }
+    </script>
+</body>
+</html>
