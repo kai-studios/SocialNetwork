@@ -23,4 +23,4 @@ The project includes both the frontend and backend parts of the social network:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/username/SocialNetwork.git
+git clone https://github.com/kaiproduction/SocialNetwork.git
